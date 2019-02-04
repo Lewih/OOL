@@ -1,7 +1,6 @@
 ;Primitiva def class
 (defparameter *classes-specs* (make-hash-table))
 
-;class-spec = ( oolinst <class> <slot-value>* )
 (defun add-class-spec (name class-spec)
   (setf (gethash name *classes-specs*) class-spec))
 
@@ -10,7 +9,7 @@
 
 
 (defun def-class (class-name parents &rest slot-value)
-  (
+  (if (null parents)
     ))
 
 ;Primitiva New

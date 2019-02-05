@@ -1,11 +1,13 @@
-;Primitiva def class
-(defparameter *classes-specs* (make-hash-table))
+;Primitiva def class hash table con tutte le definizioni di classi
+(defparameter classes (make-hash-table))
 
+;aggiunge classe alla hash table
 (defun add-class-spec (name class-spec)
-  (setf (gethash name *classes-specs*) class-spec))
+  (setf (gethash name classes) class-spec))
 
+;ritorna la struttura di una classe dato il nome della stessa
 (defun get-class-spec (name)
-  (gethash name *classes-specs*))
+  (gethash name classes))
 
 
 (defun def-class (class-name parents &rest slot-value)

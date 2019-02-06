@@ -25,3 +25,7 @@
 ;Primitiva getvx. Slot-name deve essere una lista non vuota
 (defun getvx (instance &rest slot-name)
   ())
+
+ (defun formatta (slot-value)
+	(if (null slot-value) nil
+	(append (list (list (first slot-value) (second slot-value))) (formatta (cdr( cdr slot-value))))))

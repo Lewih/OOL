@@ -31,7 +31,7 @@
 	(append (list (list (first slot-value) (second slot-value))) (formatta (cdr( cdr slot-value))))))
 
 
-;def-class non funziona così, solo scheletro
+;def-class ora funziona
 (defun def-class (name parents &rest slot-value)
-	(add-class-spec  'name (append (list parents) (formatta slot-value))))
+	(add-class-spec  name (append (list parents) (formatta slot-value))))
 	

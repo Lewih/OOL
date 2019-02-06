@@ -31,5 +31,5 @@
 	(append (list (list (first slot-value) (second slot-value))) (formatta (cdr( cdr slot-value))))))
 
 (defun defclass (name parents &rest slot-value)
-	(add-class-spec  'name (append (list parents) formatta(slot-value))))
+	(add-class-spec  'name (append (list parents) (formatta slot-value))))
 	

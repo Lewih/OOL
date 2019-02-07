@@ -41,5 +41,6 @@
 	 (append (new1 (car (get-class-spec class-name)) param) (cdr (get-class-spec class-name))))))
 ;function that is used to cicle to the superclasses of a class and call the new recurvivly on them
 ;TODO il problema potrebbe essere che chiamo passando param invece che un elenco di parametri &rest riceve una lista e quindi fa una lista che contiene la lista
+; spoiler, si, quello è il problema
 (defun new1(superC param)
 	(append (new (car superC) param) new1(cdr superC)))

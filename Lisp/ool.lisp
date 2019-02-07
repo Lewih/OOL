@@ -34,4 +34,11 @@
 ;def-class ora funziona
 (defun def-class (name parents &rest slot-value)
 	(add-class-spec  name (append (list parents) (formatta slot-value))))
-	
+
+;new class not tested
+(defun new (class-name &rest param)
+	((if (null param) nil
+	 (append (new1 (car (get-class-spec class-name)) param) (cdr (get-class-spec class-name))))))
+;function that is used to cicle to the superclasses of a class and call the new recurvivly on them	
+(defun new1(superC param)
+	(append (new (car superC) param) new1(cdr superC)))

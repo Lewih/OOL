@@ -93,14 +93,14 @@
 <<<<<<< HEAD
 =======
 ;new class not tested
-(defun new (class-name &rest param)
-	((if (null param) nil
-	 (append (new1 (car (get-class-spec class-name)) param) (cdr (get-class-spec class-name))))))
+;(defun new (class-name &rest param)
+;	((if (null param) nil
+;	 (append (new1 (car (get-class-spec class-name)) param) (cdr (get-class-spec class-name))))))
 ;function that is used to cicle to the superclasses of a class and call the new recurvivly on them
 ;TODO il problema potrebbe essere che chiamo passando param invece che un elenco di parametri &rest riceve una lista e quindi fa una lista che contiene la lista
 ; spoiler, si, quello è il problema
-(defun new1(superC param)
-	(append (new (car superC) param) new1(cdr superC)))
+;(defun new1(superC param)
+;	(append (new (car superC) param) new1(cdr superC)))
 
 ;funzione che dato un nome di una funzione e il suo corpo la definisce a tempo di esecuzione e ci aggiunge il parametro this
 ;la funzione (nel senso di scopo) del parametro this è la seguente, al parametro this si passa come valore l'oggetto su cui si vuole

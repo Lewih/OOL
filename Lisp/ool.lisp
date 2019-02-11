@@ -56,7 +56,7 @@
   (let* ((is-in-instance (recursive-getv-instance (third instance) slot-name))) ; corretto errore
     (if is-in-instance
 	(second is-in-instance)
-	(let* ((is-in-tree (recursive-getv-tree2 (list (second instance)) slot-name))); uso tree2
+	(let* ((is-in-tree (recursive-getv-tree (list (second instance)) slot-name))); uso tree2
 	  (if is-in-tree
 	      (second is-in-tree)
 	      (error "Errore: valore non valido"))))))
@@ -73,8 +73,9 @@
     ((not (equal (first (first values)) slot-name))
      (recursive-getv-instance (rest values) slot-name)))) ;passo
 
-(defun recursive-getv-tree (classes slot-name) ; ritorna una coppia, non in uso
-  (let* ((is-in-level (recursive-getv-instance (build-values-list classes) slot-name) ))
+(defun recursive-getv-tree (classes slot-name) ; ritorna una coppia, uso questa
+  (let* ((is-in-level (recursive-getv-instance (second (get-class-spec (first classes)))
+					       slot-name)))
     (cond
       ((equal classes  NIL)
        NIL)
@@ -83,29 +84,8 @@
        is-in-level)
       
       ((not is-in-level)
-       (recursive-getv-tree (build-superclasses-list classes) slot-name)))))
-
-(defun recursive-getv-tree2 (classes slot-name) ; ritorna una coppia, uso questa
-  (let* ((is-in-level (recursive-getv-instance (build-values-list classes) slot-name) ))
-    (cond
-      ((equal classes  NIL)
-       NIL)
-      
-      (is-in-level
-       is-in-level)
-      
-      ((not is-in-level)
-       (recursive-getv-tree2 (build-superclasses-list classes) slot-name)))))
-
-(defun build-values-list (classes)
-  (if (equal classes NIL)
-      NIL
-      (append (second (get-class-spec (first classes))) (build-values-list (rest classes)))))
-
-(defun build-superclasses-list (classes)
-  (if (equal classes NIL)
-      NIL
-      (append (first (get-class-spec (first classes))) (build-superclasses-list (rest classes)))))
+       (recursive-getv-tree (append (first (get-class-spec (first classes))) (rest classes))
+			     slot-name)))))
 
 ;Primitiva getvx. Slot-name deve essere una lista non vuota. divisione in 2 metodi per 2 motivi 
 ;-primo il controllo che slot-name sia ugugale a nil non deve interferire con lo stesso controllo fatto nella ricorsione

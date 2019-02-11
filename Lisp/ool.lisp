@@ -113,12 +113,9 @@
 
 ;Primitiva getvx
 (defun getvx (instance &rest slot-name)
-  (cond
-    ((null slot-name)
-     (error "Errore: slot-name vuoto"))
-    
-    ((not (equal 'oolinst (first instance)))
-     (error "Errore: istanza non valida")))
+  (if (null slot-name)
+      (error "Errore: slot-name vuoto"))
+  
   (getvx-recursive instance slot-name))
 
 (defun getvx-recursive (instance slot-name)

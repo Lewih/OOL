@@ -30,6 +30,24 @@
   ;class-name
   )
 
+;controllo che first sia simbolo in slot-value
+(defun values-control (values)
+  (if (equal values NIL)
+      NIL
+      (or (not(symbolp (first (first values))))
+	  (values-control (rest values)))))
+
+;controllo che parents non contenga il nome di classe
+(defun parents-control (class-name parents)
+  (cond ((equal parents NIL)
+	 NIL)
+	
+	((not (get-class-spec (first parents)))
+	 (error "Errore: classe genitore non esistente")) ;controllo che esistano i genitori
+	
+	((or (equal (first parents) class-name)
+	     (parents-control class-name (rest parents)))))) ;controllo uguaglianza
+
 ;Primitiva New 
 (defun new (class-name &rest parameters)
   (if (values-control (formatta parameters))
@@ -73,7 +91,7 @@
     ((not (equal (first (first values)) slot-name))
      (recursive-getv-instance (rest values) slot-name)))) ;passo
 
-(defun recursive-getv-tree (classes slot-name) ; ritorna una coppia, uso questa
+(defun recursive-getv-tree (classes slot-name) ; ritorna una coppia ;FINISHED
   (let* ((is-in-level (recursive-getv-instance (second (get-class-spec (first classes)))
 					       slot-name)))
     (cond
@@ -102,24 +120,6 @@
 (defun formatta (slot-value)
 	(if (null slot-value) nil
 	(append (list (list (first slot-value) (second slot-value))) (formatta (cdr( cdr slot-value))))))
-
-;controllo che first sia simbolo in slot-value
-(defun values-control (values)
-  (if (equal values NIL)
-      NIL
-      (or (not(symbolp (first (first values))))
-	  (values-control (rest values)))))
-
-;controllo che parents non contenga il nome di classe
-(defun parents-control (class-name parents)
-  (cond ((equal parents NIL)
-	 NIL)
-	
-	((not (get-class-spec (first parents)))
-	 (error "Errore: classe genitore non esistente")) ;controllo che esistano i genitori
-	
-	((or (equal (first parents) class-name)
-	  (parents-control class-name (rest parents)))))) ;controllo uguaglianza 
 
 ;new class not tested
 ;(defun new (class-name &rest param)

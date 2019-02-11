@@ -36,23 +36,27 @@
       (error "Error: bad format"))
   
   (if (and (get-class-spec class-name)
-	   (instance-check (first (get-class-spec class-name)) (formatta parameters)))
-      (list 'oolist class-name (formatta parameters))
-      NIL))
+	   (instance-check class-name (formatta parameters)))
+      (list 'oolinst class-name (formatta parameters))
+      (error "Errore: classe o parametro non esistente")))
 
 (defun instance-check (class parameters)
   (if (equal parameters NIL)
       T
-      (or (getv (list 'oolist class NIL) (first(first parameters))) ;TODO parametro potrebbe avere NIL, chiamo errore
+      (and (getv (list 'oolinst class NIL) (first(first parameters))) ;TODO parametro potrebbe avere NIL, chiamo errore
 	   (instance-check class (rest parameters)))))
 
 ;Primitiva getv
 (defun getv (instance slot-name)
-  (let* ((is-in-instance (recursive-getv-instance (rest (rest instance)) slot-name)))
-    (write is-in-instance)
+  (if (not slot-name)
+      (error "Errore: inserire un parametro"))
+  (if (not (equal 'oolinst (first instance)))
+      (error "Errore: istanza non valida"))
+  
+  (let* ((is-in-instance (recursive-getv-instance (third instance) slot-name))) ; corretto errore
     (if is-in-instance
 	(second is-in-instance)
-	(let* ((is-in-tree (recursive-getv-tree (list (second instance)) slot-name)))
+	(let* ((is-in-tree (recursive-getv-tree2 (list (second instance)) slot-name))); uso tree2
 	  (if is-in-tree
 	      (second is-in-tree)
 	      (error "Errore: valore non valido"))))))
@@ -69,7 +73,7 @@
     ((not (equal (first (first values)) slot-name))
      (recursive-getv-instance (rest values) slot-name)))) ;passo
 
-(defun recursive-getv-tree (classes slot-name) ; ritorna una coppia
+(defun recursive-getv-tree (classes slot-name) ; ritorna una coppia, non in uso
   (let* ((is-in-level (recursive-getv-instance (build-values-list classes) slot-name) ))
     (cond
       ((equal classes  NIL)
@@ -80,6 +84,18 @@
       
       ((not is-in-level)
        (recursive-getv-tree (build-superclasses-list classes) slot-name)))))
+
+(defun recursive-getv-tree2 (classes slot-name) ; ritorna una coppia, uso questa
+  (let* ((is-in-level (recursive-getv-instance (build-values-list classes) slot-name) ))
+    (cond
+      ((equal classes  NIL)
+       NIL)
+      
+      (is-in-level
+       is-in-level)
+      
+      ((not is-in-level)
+       (recursive-getv-tree2 (build-superclasses-list classes) slot-name)))))
 
 (defun build-values-list (classes)
   (if (equal classes NIL)
@@ -95,6 +111,7 @@
 (defun getvx (instance &rest slot-name)
   ())
 
+;funzione formattazione tuple
 (defun formatta (slot-value)
 	(if (null slot-value) nil
 	(append (list (list (first slot-value) (second slot-value))) (formatta (cdr( cdr slot-value))))))

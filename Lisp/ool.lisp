@@ -108,10 +108,13 @@
       (append (first (get-class-spec (first classes))) (build-superclasses-list (rest classes)))))
 
 ;Primitiva getvx. Slot-name deve essere una lista non vuota
-(defun getvx (instance &rest slot-name)
-  (if (null slot-name)
-      instance
-      (getv (getvx instance (butlast slot-name)) (last slot-name))))
+(defun getvx (instance &rest slot-name) (if (null slot-name)
+                                            (error "Error: non sono stati passati slot-name")
+                                            (getvx1 instance slot-name)))
+
+(defun getvx1 (instance slot-name)  (if (null slot-name)
+                                        instance
+                                        (getv (getvx instance (butlast slot-name)) (last slot-name))))
 
 ;funzione formattazione tuple
 (defun formatta (slot-value)

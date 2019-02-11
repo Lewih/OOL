@@ -89,16 +89,16 @@
     ((equal values NIL)
      NIL);base
     
-    ((and (equal (first (first values)) slot-name)
-	  (not (equal (second (first values)) '=>)))
-     (first values)) ;TODO controllare futura codifica metodi TODO
+    ((equal (first (first values)) slot-name)
+     (first values)) ;tratto i metodi come valori
     
     ((not (equal (first (first values)) slot-name))
      (recursive-getv-instance (rest values) slot-name)))) ;passo
 
 (defun recursive-getv-tree (classes slot-name) ; ritorna una coppia ;FINISHED
   (let* ((is-in-level
-	  (recursive-getv-instance (second (get-class-spec (first slot-name)))
+	  (recursive-getv-instance (second (get-class-spec (first classes)))
+				   slot-name)))
     (cond
       ((equal classes  NIL)
        NIL)

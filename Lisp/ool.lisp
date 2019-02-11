@@ -125,10 +125,14 @@
 
 ;controllo che parents non contenga il nome di classe
 (defun parents-control (class-name parents)
-  (if (equal parents NIL)
-      NIL
-      (or (equal (first parents) class-name)
-	  (parents-control class-name (rest parents)))))
+  (cond ((equal parents NIL)
+	 NIL)
+	
+	((not (get-class-spec (first parents)))
+	 (error "Errore: classe genitore non esistente")) ;controllo che esistano i genitori
+	
+	((or (equal (first parents) class-name)
+	  (parents-control class-name (rest parents)))))) ;controllo uguaglianza 
 
 ;new class not tested
 ;(defun new (class-name &rest param)

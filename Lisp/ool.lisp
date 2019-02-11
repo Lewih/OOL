@@ -107,7 +107,9 @@
       NIL
       (append (first (get-class-spec (first classes))) (build-superclasses-list (rest classes)))))
 
-;Primitiva getvx. Slot-name deve essere una lista non vuota
+;Primitiva getvx. Slot-name deve essere una lista non vuota. divisione in 2 metodi per 2 motivi 
+;-primo il controllo che slot-name sia ugugale a nil non deve interferire con lo stesso controllo fatto nella ricorsione
+;-secondo  perchè altrimenti no va prorpio, &rest e ricorsione non vanno daccordo come ti avevo detto
 (defun getvx (instance &rest slot-name) (if (null slot-name)
                                             (error "Error: non sono stati passati slot-name")
                                             (getvx1 instance slot-name)))

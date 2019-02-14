@@ -122,7 +122,6 @@
     ((rest slot-name)
      (getvx-recursive (getv instance (first slot-name)) (rest slot-name)))))
 
-
 ;Metodi, definisco il metodo in chiamata new
 
 ;riscrivo S-expression cosi da poter usare this
@@ -131,7 +130,6 @@
 ;funzione principale
 (defun process-method (method-name method-spec)
   (eval (rewrite-method-code method-name method-spec)))
-
 
 ;funzione che dato un nome di una funzione e il suo corpo la definisce a tempo di esecuzione e ci aggiunge il parametro this
 ;la funzione (nel senso di scopo) del parametro this e la seguente, al parametro this si passa come valore l'oggetto su cui si vuole

@@ -21,13 +21,14 @@
     ((parents-control class-name parents)
      (error "Error: classe e parents con stesso nome"))
     ((values-control (formatta slot-value))
-     (error "Error: bad values formatting")))
+     (error "Error: bad values formatting"))
+    )
   
   (let*
       ((genitori
 	(if (null parents)
 	    NIL
-	    parents)))
+	    (remove-duplicates parents))))
     (remhash class-name *classes-specs*) ;rimuovo classe se presente
     (add-class-spec class-name (list genitori (formatta slot-value))))
   ;ritorno class-name da specifica
@@ -49,6 +50,20 @@
      (error "Errore: classe genitore non esistente"))
     ((or (equal (first parents) class-name)
 	 (parents-control class-name (rest parents))))))
+
+(defun is-method (values)
+  (cond
+    ((null values)
+     NIL)
+    
+    ((and (listp (second (first values)))
+	  (equal (first (second (first values))) '=>))
+     (process-method
+      (first (first values)) (second (first values))))
+    
+    ((not (null values))
+     (is-method (rest values)))))
+     
 
 ;Primitiva New 
 (defun new (class-name &rest parameters)
@@ -129,6 +144,7 @@
 
 ;funzione principale
 (defun process-method (method-name method-spec)
+  
   (eval (rewrite-method-code method-name method-spec)))
 
 ;funzione che dato un nome di una funzione e il suo corpo la definisce a tempo di esecuzione e ci aggiunge il parametro this

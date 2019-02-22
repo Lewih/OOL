@@ -147,7 +147,7 @@
 
 ;riscrivo S-expression cosi da poter usare this
 (defun rewrite-method-code (method-name method-spec)
-  (if (atom method-name)
+  (if (symbolp method-name)
       (append
        (list 'lambda)
        (list(append (list 'this) (second method-spec)))

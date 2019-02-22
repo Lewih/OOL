@@ -38,11 +38,17 @@ new(Instance, Class_name, Values) :-
 
 class_values(_,[]).
 
+
 class_values(Class, [Name = _|Others]) :-
     getv_hierarchy([Class], Name, Value),
-    %Value \= method(_), TODO riconoscere un metodo
+    is_not_metod(Value),
     class_values(Class, Others).
 
+is_not_method(Atom):- 
+	atom_string(Atom,Str),
+	sub_string(Str,0,6,_,SubStr),
+	SubStr\="method".
+	
 getv(Instance, Slot, Result) :-
     instance(Instance, _, Values),
     value_in_list(Values, Slot,Result).

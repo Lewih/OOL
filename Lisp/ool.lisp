@@ -28,9 +28,10 @@
       ((genitori
 	(if (null parents)
 	    NIL
-	    (remove-duplicates parents))))
+	    (remove-duplicates parents)))
+       (formatted-slot (identify-method (formatta slot-value) nil)))
     (remhash class-name *classes-specs*) ;rimuovo classe se presente
-    (add-class-spec class-name (list genitori (formatta slot-value))))
+    (add-class-spec class-name (list genitori formatted-slot)))
   ;ritorno class-name da specifica
   class-name)
 
@@ -51,18 +52,23 @@
     ((or (equal (first parents) class-name)
 	 (parents-control class-name (rest parents))))))
 
-(defun is-method (values)
+(defun identify-method (values result)
   (cond
     ((null values)
-     NIL)
+     result)
     
     ((and (listp (second (first values)))
 	  (equal (first (second (first values))) '=>))
-     (process-method
-      (first (first values)) (second (first values))))
-    
+     (identify-method (rest values) (append result					 
+					    (list
+					     (list
+					      (first (first values))
+					      (process-method
+					       (first (first values))
+					       (second (first values))))))))
     ((not (null values))
-     (is-method (rest values)))))
+     (identify-method (rest values) (append result (list (first values)))))
+    ))
      
 
 ;Primitiva New 
@@ -140,18 +146,17 @@
 ;Metodi, definisco il metodo in chiamata new
 
 ;riscrivo S-expression cosi da poter usare this
-(defun rewrite-method-code (method-name method-spec))
+(defun rewrite-method-code (method-name method-spec)
+  (if (atom method-name)
+      (append
+       (list 'lambda)
+       (list(append (list 'this) (second method-spec)))
+       (list (append '(progn) (rest (rest method-spec)))))))
 
 ;funzione principale
 (defun process-method (method-name method-spec)
-  
+  (setf (fdefinition method-name)
+	(lambda (this &rest args)
+	  (apply (getv this method-name)
+		 (append (list this) args))))
   (eval (rewrite-method-code method-name method-spec)))
-
-;funzione che dato un nome di una funzione e il suo corpo la definisce a tempo di esecuzione e ci aggiunge il parametro this
-;la funzione (nel senso di scopo) del parametro this e la seguente, al parametro this si passa come valore l'oggetto su cui si vuole
-;chiamare il metodo, e nella funzione i riferimenti a this passeranno al oggetto passato, di conseguenza ogni funzione oltre ai suoi parametri
-;avra un parametro this messo appositamente per effettuare il collegamento tra l'utilizzo di this stesso e l'effettivo oggetto
-
-(defun def-unction (name function) 
-  (compile (eval (append (list 'defun) (list name) (append (list (append (list 'this) (car function)))
-							   (cdr function))))))

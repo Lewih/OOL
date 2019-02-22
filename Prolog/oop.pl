@@ -38,11 +38,17 @@ new(Instance, Class_name, Values) :-
 
 class_values(_,[]).
 
+
 class_values(Class, [Name = _|Others]) :-
     getv_hierarchy([Class], Name, Value),
-    %Value \= method(_), TODO riconoscere un metodo
+    is_not_method(Value),
     class_values(Class, Others).
 
+is_not_method(Atom):- 
+	atom_string(Atom,Str),
+	sub_string(Str,0,6,_,SubStr),
+	SubStr\="method".
+	
 getv(Instance, Slot, Result) :-
     instance(Instance, _, Values),
     value_in_list(Values, Slot,Result).
@@ -73,16 +79,16 @@ getvx(Instance, [Slot|Others], Result) :-
     getv(Instance, Slot, Match),
     getvx(Match, Others, Result).
 
+
 	
 not_member(X,[]).
-not_member(X,[X|T]):- fail.
-not_member(X,[Y|T]):- not_member(X,T).
+not_member(X,[Y|T]):- X\=Y, not_member(X,T).
 	
-%versione corretta ma che usa not, non so per quale motivo non riesco a far andare la not member lol, B è A senza elementi duplicati
 rimuovi_duplicati(A,B) :-
     rimuovi_duplicati(A, B, []).
 rimuovi_duplicati([],[],_).
 rimuovi_duplicati([H|T],[H|Out],Old) :-
-    not(member(H,Old)), rimuovi_duplicati(T,Out, [H|Old]).
+    not_member(H,Old), rimuovi_duplicati(T,Out, [H|Old]).
 rimuovi_duplicati([H|T],Out, Old) :-
     member(H,Old), rimuovi_duplicati(T,Out,Old).
+	

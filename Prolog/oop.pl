@@ -15,7 +15,7 @@ values_control([Atom = _|Tail]) :-
     values_control(Tail).
 
 def_class(Class_name, Parents, Slots) :-
-    sort(Parents, Parents_clean), %TODO da implementare metodo migliore per rimuovere duplicati
+    rimuovi_duplicati(Parents, Parents_clean), 
     parents_control(Parents_clean, Class_name),
     values_control(Slots),
     Term =.. [class, Class_name, Parents_clean, Slots],

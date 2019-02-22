@@ -41,7 +41,7 @@ class_values(_,[]).
 
 class_values(Class, [Name = _|Others]) :-
     getv_hierarchy([Class], Name, Value),
-    is_not_metod(Value),
+    is_not_method(Value),
     class_values(Class, Others).
 
 is_not_method(Atom):- 

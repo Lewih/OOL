@@ -37,7 +37,7 @@ getv(Instance, Slot, Result) :-
     value_in_class(Values, Slot,Result), % chiama la funzione che cerca Slot in Values e che mette in Result il value quando lo trova
     !.
 	
-
+% suddetta funzione che cerca Slot in Values e che mette in Result il value quando lo trova
 value_in_class([Name = Value|Tail], Name, Result) :-
     value_in_class(Tail,Slot,Value).
 

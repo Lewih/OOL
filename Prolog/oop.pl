@@ -38,8 +38,7 @@ getv(Instance, Slot, Result) :-
     !.
 	
 % suddetta funzione che cerca Slot in Values e che mette in Result il value quando lo trova
-value_in_class([Name = Value|Tail], Name, Result) :-
-    value_in_class(Tail,Slot,Value).
+value_in_class([Name = Value|Tail], Name, Value).
 
 value_in_class([Name = Value|Tail],Slot,Result) :-
     value_in_class(Tail,Slot,Result).

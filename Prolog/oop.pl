@@ -34,8 +34,20 @@ new(Instance, Class_name, Values) :-
 
 getv(Instance, Slot, Result) :-
     instance(Instance, Parents, Values),
-    
+    value_in_class(Values, Slot,Result),
     !.
+	
+
+value_in_class([Name = Value|Tail], Name, Result) :-
+    value_in_class(Tail,Slot,Value).
+
+value_in_class([Name = Value|Tail],Slot,Result) :-
+    value_in_class(Tail,Slot,Result).
+
+
+value_in_class(_,_,Result).
+
+
 
 %versione migliore ma che tiene l'ultima occorrenza	
 %rimuovi_duplicati([], []).

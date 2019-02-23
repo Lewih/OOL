@@ -1,5 +1,5 @@
 ;;;; Pugno Michele 830513
-;;;; Piovani Davide
+;;;; Piovani Davide 830113
 
 ;Definizione e manipolazione Hash-Table
 (defparameter *classes-specs* (make-hash-table))

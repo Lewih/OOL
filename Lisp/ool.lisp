@@ -107,7 +107,6 @@
      (error "Errore: slot-name non valido"))
     ((not (equal 'oolinst (first instance)))
      (error "Errore: istanza non valida")))
-  
   (let* ((is-in-instance
 	  (recursive-getv-instance (third instance) slot-name)))
     (if is-in-instance

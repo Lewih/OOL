@@ -1,13 +1,14 @@
 ;;;; Pugno Michele 830513
 ;;;; Piovani Davide
 
+;Definizione e manipolazione Hash-Table
 (defparameter *classes-specs* (make-hash-table))
 (defun add-class-spec (name class-spec)
   (setf (gethash name *classes-specs*) class-spec))
 (defun get-class-spec (name)
   (gethash name *classes-specs*))
 
-;funzione formattazione per lista associativa
+;Funzione formattazione per lista associativa
 (defun formatta (slot-value)
   (if (null slot-value)
       nil
@@ -42,7 +43,7 @@
       (or (not(symbolp (first (first values))))
 	  (values-control (rest values)))))
 
-;controllo esistenza parents e omonimia con class-name
+;Controllo esistenza parents e omonimia con class-name
 (defun parents-control (class-name parents)
   (cond
     ((equal parents NIL)
@@ -52,6 +53,7 @@
     ((or (equal (first parents) class-name)
 	 (parents-control class-name (rest parents))))))
 
+;Identifico i metodi e li tratto
 (defun identify-method (values result)
   (cond
     ((null values)
@@ -66,8 +68,9 @@
 			     (first (first values))
 			     (second (first values))))))))
     ((not (null values))
-     (identify-method (rest values) (append result
-					    (list (first values)))))))
+     (identify-method (rest values)
+		      (append result
+			      (list (first values)))))))
 
 ;Primitiva New 
 (defun new (class-name &rest parameters)
@@ -78,6 +81,7 @@
       (list 'oolinst class-name (formatta parameters))
       (error "Errore: classe o parametro non esistente")))
 
+;Controllo esistenza dei valori di New
 (defun instance-check (class parameters)
   (if (equal parameters NIL)
       T
@@ -103,7 +107,7 @@
 	      (second is-in-tree)
 	      (error "Errore: valore non valido"))))))
 
-;ritorna una coppia
+;Ritorna una coppia
 (defun recursive-getv-instance (values slot-name)
   (cond
     ((equal values NIL)
@@ -113,7 +117,7 @@
     ((not (equal (first (first values)) slot-name))
      (recursive-getv-instance (rest values) slot-name))))
 
-;ritorna una coppia
+;Ritorna una coppia
 (defun recursive-getv-tree (classes slot-name)
   (let* ((is-in-level
 	  (recursive-getv-instance (second (get-class-spec (first classes)))
@@ -134,6 +138,7 @@
       (error "Errore: slot-name vuoto"))
   (getvx-recursive instance slot-name))
 
+;Effettiva getvx
 (defun getvx-recursive (instance slot-name)
   (cond
     ((not (symbolp (first slot-name)))
@@ -144,7 +149,7 @@
      (getvx-recursive (getv instance (first slot-name))
 		      (rest slot-name)))))
 
-;riscrivo S-expression cosi da poter usare this
+;Riscrivo S-expression cosi da poter usare this
 (defun rewrite-method-code (method-name method-spec)
   (if (symbolp method-name)
       (append
@@ -152,7 +157,7 @@
        (list(append (list 'this) (second method-spec)))
        (list (append '(progn) (rest (rest method-spec)))))))
 
-;funzione principale
+;Funzione principale gestione metodi
 (defun process-method (method-name method-spec)
   (setf (fdefinition method-name)
 	(lambda (this &rest args)

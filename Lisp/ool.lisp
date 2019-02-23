@@ -1,3 +1,6 @@
+;;;; Pugno Michele 830513
+;;;; Piovani Davide
+
 (defparameter *classes-specs* (make-hash-table))
 (defun add-class-spec (name class-spec)
   (setf (gethash name *classes-specs*) class-spec))
@@ -21,18 +24,15 @@
     ((parents-control class-name parents)
      (error "Error: classe e parents con stesso nome"))
     ((values-control (formatta slot-value))
-     (error "Error: bad values formatting"))
-    )
-  
+     (error "Error: bad values formatting")))
   (let*
       ((genitori
 	(if (null parents)
 	    NIL
 	    (remove-duplicates parents)))
        (formatted-slot (identify-method (formatta slot-value) nil)))
-    (remhash class-name *classes-specs*) ;rimuovo classe se presente
+    (remhash class-name *classes-specs*)
     (add-class-spec class-name (list genitori formatted-slot)))
-  ;ritorno class-name da specifica
   class-name)
 
 ;controllo che first sia simbolo in slot-value formattata
@@ -56,20 +56,18 @@
   (cond
     ((null values)
      result)
-    
     ((and (listp (second (first values)))
 	  (equal (first (second (first values))) '=>))
-     (identify-method (rest values) (append result					 
-					    (list
-					     (list
-					      (first (first values))
-					      (process-method
-					       (first (first values))
-					       (second (first values))))))))
+     (identify-method
+      (rest values)
+      (append result (list (list
+			    (first (first values))
+			    (process-method
+			     (first (first values))
+			     (second (first values))))))))
     ((not (null values))
-     (identify-method (rest values) (append result (list (first values)))))
-    ))
-     
+     (identify-method (rest values) (append result
+					    (list (first values)))))))
 
 ;Primitiva New 
 (defun new (class-name &rest parameters)
@@ -105,16 +103,18 @@
 	      (second is-in-tree)
 	      (error "Errore: valore non valido"))))))
 
-(defun recursive-getv-instance (values slot-name);ritorna una coppia ;FINISHED
+;ritorna una coppia
+(defun recursive-getv-instance (values slot-name)
   (cond
     ((equal values NIL)
-     NIL);base
+     NIL)
     ((equal (first (first values)) slot-name)
-     (first values)) ;tratto i metodi come valori
+     (first values))
     ((not (equal (first (first values)) slot-name))
-     (recursive-getv-instance (rest values) slot-name)))) ;passo
+     (recursive-getv-instance (rest values) slot-name))))
 
-(defun recursive-getv-tree (classes slot-name) ; ritorna una coppia ;FINISHED
+;ritorna una coppia
+(defun recursive-getv-tree (classes slot-name)
   (let* ((is-in-level
 	  (recursive-getv-instance (second (get-class-spec (first classes)))
 				   slot-name)))
@@ -141,9 +141,8 @@
     ((null (rest slot-name))
      (getv instance (first slot-name)))
     ((rest slot-name)
-     (getvx-recursive (getv instance (first slot-name)) (rest slot-name)))))
-
-;Metodi, definisco il metodo in chiamata new
+     (getvx-recursive (getv instance (first slot-name))
+		      (rest slot-name)))))
 
 ;riscrivo S-expression cosi da poter usare this
 (defun rewrite-method-code (method-name method-spec)

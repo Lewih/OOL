@@ -72,14 +72,17 @@
 		      (append result
 			      (list (first values)))))))
 
-;Primitiva New 
+;Primitiva New
 (defun new (class-name &rest parameters)
-  (if (values-control (formatta parameters))
-      (error "Error: bad format"))
-  (if (and (get-class-spec class-name)
-	   (instance-check class-name (formatta parameters)))
-      (list 'oolinst class-name (formatta parameters))
-      (error "Errore: classe o parametro non esistente")))
+  (let* ((formatted (formatta parameters)))
+    (if (values-control formatted)
+	(error "Error: bad format"))
+    (if (and (get-class-spec class-name)
+	     (instance-check class-name formatted))
+	(list 'oolinst
+	      class-name
+	      (identify-method formatted nil))
+	(error "Errore: classe o parametro non esistente"))))
 
 ;Controllo esistenza dei valori di New
 (defun instance-check (class parameters)
@@ -102,7 +105,8 @@
     (if is-in-instance
 	(second is-in-instance)
 	(let* ((is-in-tree
-		(recursive-getv-tree (list (second instance)) slot-name)))
+		(recursive-getv-tree (list (second instance))
+				     slot-name)))
 	  (if is-in-tree
 	      (second is-in-tree)
 	      (error "Errore: valore non valido"))))))
@@ -120,17 +124,19 @@
 ;Ritorna una coppia
 (defun recursive-getv-tree (classes slot-name)
   (let* ((is-in-level
-	  (recursive-getv-instance (second (get-class-spec (first classes)))
-				   slot-name)))
+	  (recursive-getv-instance
+	   (second (get-class-spec (first classes)))
+	   slot-name)))
     (cond
       ((equal classes  NIL)
        NIL)
       (is-in-level
        is-in-level)
       ((not is-in-level)
-       (recursive-getv-tree (append (first (get-class-spec (first classes)))
-				    (rest classes))
-			    slot-name)))))
+       (recursive-getv-tree
+	(append (first (get-class-spec (first classes)))
+		(rest classes))
+	slot-name)))))
 
 ;Primitiva getvx
 (defun getvx (instance &rest slot-name)

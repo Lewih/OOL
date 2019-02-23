@@ -82,14 +82,22 @@
 	(list 'oolinst
 	      class-name
 	      (identify-method formatted nil))
-	(error "Errore: classe o parametro non esistente"))))
+	(error "Errore: classe o parametro incompatibile"))))
 
-;Controllo esistenza dei valori di New
+;Controllo valori e metodi di New 
 (defun instance-check (class parameters)
   (if (equal parameters NIL)
       T
-      (and (getv (list 'oolinst class NIL) (first(first parameters)))
-	   (instance-check class (rest parameters)))))
+      (let* ((class-value (getv (list 'oolinst class NIL)
+				(first(first parameters))))
+	     (instance-value (if (listp (second (first parameters)))
+				 (first (second (first parameters)))
+				 (second (first parameters)))))
+	(and
+	 (or (and (functionp class-value) (equal '=> instance-value))
+	     (and (not (functionp class-value))
+		  (not (equal '=> instance-value))))
+	(instance-check class (rest parameters))))))
 
 ;Primitiva getv
 (defun getv (instance slot-name)

@@ -76,7 +76,7 @@
 (defun new (class-name &rest parameters)
   (let* ((formatted (formatta parameters)))
     (if (values-control formatted)
-	(error "Error: bad format"))
+	(error "Error: bad input format"))
     (if (and (get-class-spec class-name)
 	     (instance-check class-name formatted))
 	(list 'oolinst
@@ -97,7 +97,7 @@
 	 (or (and (functionp class-value) (equal '=> instance-value))
 	     (and (not (functionp class-value))
 		  (not (equal '=> instance-value))))
-	(instance-check class (rest parameters))))))
+	 (instance-check class (rest parameters))))))
 
 ;Primitiva getv
 (defun getv (instance slot-name)

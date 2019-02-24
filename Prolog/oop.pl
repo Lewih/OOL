@@ -91,4 +91,19 @@ rimuovi_duplicati([H|T],[H|Out],Old) :-
     not_member(H,Old), rimuovi_duplicati(T,Out, [H|Old]).
 rimuovi_duplicati([H|T],Out, Old) :-
     member(H,Old), rimuovi_duplicati(T,Out,Old).
+    
+replace-this(String,Name,Param,MethodBody):-
+    sub_string(String, Before, _, After, "="),    % trovo posizione uguale	
+    sub_string(String, 0, Before, _, NameString), % prendo la parte prima dell'= e la salvo come NameString
+    atom_string(Name, NameString),                % creo l'atomo col nome del metodo	
+    sub_string(String, _, After, 0, Value),       %  la stringa Value  contiene tutto ciò che c'è dopo l'uguale	
+    sub_string(Value, Start, _, After1, "["),     % cerco in quella stringa la prima  in posizione start
+    sub_string(Value, _, After1, 0, ValueNP),     % valueNP contiene Value ma senza la prima  
+    sub_string(ValueNP,_ , _, Finish, "]"),       % becco la parentesi chiusa
+    FineParam is Finish + 1,
+    sub_string(ValueNP,BodyStart,_, _,"("),
+    sub_string(ValueNP,0,_, FineParam ,Param),
+    sub_string(ValueNP, BodyStart,_,1,MethodBody).        
+	
+	
 	

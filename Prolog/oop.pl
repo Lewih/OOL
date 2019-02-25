@@ -37,7 +37,10 @@ new(Instance, Class_name, Values) :-
     values_control(Values),
     class_values(Class_name, Values),
     Term =.. [instance, Instance, Class_name, Values],
-    assert(Term).
+    assert(Term),
+    findall([Name, Body], get_all(Instance, Name, Body), Out),
+    append(Out_clean, [_], Out),
+    find_method(Out_clean, Instance),!.
 
 class_values(_,[]).
 class_values(Class, [Name = _|Others]) :-
@@ -46,7 +49,7 @@ class_values(Class, [Name = _|Others]) :-
 	
 getv(Instance, Slot, Result) :-
     instance(Instance, _, Values),
-    value_in_list(Values, Slot,Result)!,.
+    value_in_list(Values, Slot,Result),!.
 
 getv(Instance, Slot, Result) :-
     instance(Instance, Classname, _),

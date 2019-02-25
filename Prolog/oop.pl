@@ -151,6 +151,6 @@ define_method(Name = method(Args, Body), Instance) :-
     atom_string(Name, Name_out),
     string_concat(Name_out, New_args, Out),
     string_concat(Out, ":-", Out2),
-    string_concat(Out2, Body_out, Result),
+    string_concat(Out2, Body_out, Result), %TODO aggiungere cut finale al metodo
     term_string(Term, Result),
     assert(Term).

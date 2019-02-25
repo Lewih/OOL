@@ -3,8 +3,8 @@ def_class(Class, Parents, Slots) :-
     parents_control(Parents_clean, Class),
     values_control(Slots),
     Term =.. [class, Class, Parents_clean, Slots],
-    write(Term),
-    assert(Term).
+    assert(Term),
+    !.
 
 class_exist(Class) :-
     class(Class, _, _),
@@ -29,8 +29,9 @@ new(Instance, Class_name) :-
     class(Class_name, _, _),
     Term =.. [instance, Instance, Class_name, []],
     assert(Term),
-    findall([Name, Body], getv(Instance, Name, Body), Out),
-    find_method(Out, Instance).
+    findall([Name, Body], get_all(Instance, Name, Body), Out),
+    append(Out_clean, [_], Out),
+    find_method(Out_clean, Instance),!.
     
 
 new(Instance, Class_name, Values) :-
@@ -47,12 +48,23 @@ class_values(Class, [Name = _|Others]) :-
 	
 getv(Instance, Slot, Result) :-
     instance(Instance, _, Values),
-    value_in_list(Values, Slot,Result).
+    value_in_list(Values, Slot,Result)!,.
 
 getv(Instance, Slot, Result) :-
     instance(Instance, Classname, _),
+    getv_hierarchy([Classname], Slot, Result),!.
+
+get_all(Instance, Slot, Result) :-
+    instance(Instance, _, Values),
+    value_in_list(Values, Slot,Result).
+
+get_all(Instance, Slot, Result) :-
+    instance(Instance, Classname, _),
     getv_hierarchy([Classname], Slot, Result).
 
+
+
+getv_hierarchy([], _, _).
 
 getv_hierarchy([Class|_], Slot, Result) :-
     class(Class, _, Values),
@@ -133,15 +145,15 @@ prepare_args(Name, Args, Result) :-
 
     
 
-find_method([], _).
+find_method([], _):-!.
 find_method([Head|Tail], Instance) :-
     nth0(0, Head, Name),
     nth0(1, Head, method(Args, Body)),
     define_method(Name = method(Args, Body), Instance),
     find_method(Tail, Instance).
 
-find_method([Head|Tail]) :-
-    find_method(Tail).
+find_method([Head|Tail], Instance) :-
+    find_method(Tail, Instance),!.
 
 define_method(Name = method(Args, Body), Instance) :-
     prepare_args(Instance, Args, New_args),
@@ -151,5 +163,4 @@ define_method(Name = method(Args, Body), Instance) :-
     string_concat(Out, ":-", Out2),
     string_concat(Out2, Body_out, Result),
     term_string(Term, Result),
-    write(Term),
     assert(Term).

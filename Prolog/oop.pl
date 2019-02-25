@@ -24,7 +24,6 @@ values_control([Atom = _|Tail]) :-
     atom(Atom),
     values_control(Tail).
 
-
 new(Instance, Class_name) :-
     class(Class_name, _, _),
     Term =.. [instance, Instance, Class_name, []],
@@ -33,7 +32,6 @@ new(Instance, Class_name) :-
     append(Out_clean, [_], Out),
     find_method(Out_clean, Instance),!.
     
-
 new(Instance, Class_name, Values) :-
     class(Class_name, _, _),
     values_control(Values),
@@ -75,7 +73,6 @@ getv_hierarchy([Class|Parents], Slot, Result) :-
     append(New_parents, Parents, New_list),
     getv_hierarchy(New_list, Slot, Result).
 	
-%suddetta funzione che cerca Slot in Values e che mette in Result il value quando lo trova
 value_in_list([Name = Value|_], Name, Value).
 
 value_in_list([_ = _|Tail],Name,Result) :-
@@ -103,16 +100,6 @@ rimuovi_duplicati([H|T],[H|Out],Old) :-
 rimuovi_duplicati([H|T],Out, Old) :-
     member(H,Old),
     rimuovi_duplicati(T,Out,Old).
-
-trampolino(I, B) :-
-    getv(I, talk, R),
-    R = method(A, B).
-    %call(B).
-
-this_finder(Term, Result) :-
-    term_string(Term, String),
-    prepare_method(String, Out),
-    term_string(Result, Out).
 
 prepare_method(Name, Method_term, Output):-
     atom_string(Name, Name_string),

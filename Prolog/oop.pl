@@ -1,13 +1,9 @@
-:- dynamic class/3.
-class(object, [], []).
-
 def_class(Class, Parents, Slots) :-
     rimuovi_duplicati(Parents, Parents_clean), 
     parents_control(Parents_clean, Class),
-    append([object], Parents, Parents_final),
     values_control(Slots),
     class_not_existance(Class),
-    Term =.. [class, Class, Parents_final, Slots],
+    Term =.. [class, Class, Parents_clean, Slots],
     assert(Term),
     !.
 
@@ -32,7 +28,8 @@ class_not_existance(Class) :-
 class_not_existance(_) :-
     true,
     !.
- new(Instance, Class_name) :-
+
+new(Instance, Class_name) :-
     class(Class_name, _, _),
     instance_not_existance(Instance),
     Term =.. [instance, Instance, Class_name, []],
@@ -44,9 +41,9 @@ class_not_existance(_) :-
     
 new(Instance, Class_name, Values) :-
     class(Class_name, _, _),
-    instance_not_existance(Instance),
     values_control(Values),
     class_values(Class_name, Values),
+    instance_not_existance(Instance),
     Term =.. [instance, Instance, Class_name, Values],
     assert(Term),
     findall([Name, Body], get_all(Instance, Name, Body), Out),

@@ -45,7 +45,7 @@ new(Instance, Class_name, Values) :-
 class_values(_, []).
 
 class_values(Class, [Name = _|Others]) :-
-    getv_hierarchy([Class], Name, Value),
+    getv_hierarchy([Class], Name, _),
     class_values(Class, Others).
 	
 getv(Instance, Slot, Result) :-
@@ -87,13 +87,13 @@ value_in_list([Name = Value|_], Name, Value).
 value_in_list([_ = _|Tail],Name,Result) :-
     value_in_list(Tail, Name, Result).
 
-not_member(X, []).
+not_member(_, []).
 
 not_member(X, [Y|T]) :-
     X \= Y,
     not_member(X, T).
 
-rimuovi_duplicati([], [],_).
+rimuovi_duplicati([], [], _).
 
 rimuovi_duplicati(A, B) :-
     rimuovi_duplicati(A, B, []).
@@ -119,12 +119,12 @@ prepare_method(Name, Method_term, Output) :-
     string_concat(Start, Output1, Output2),
     prepare_method(Name, Output2, Output).
 
-prepare_method(Name, Meth, Out) :-
+prepare_method(_, Meth, Out) :-
     string(Meth),
     Out = Meth,
     !.
 
-prepare_method(Name, Meth, Out) :-
+prepare_method(_, Meth, Out) :-
     term_string(Meth, Out).
 
 prepare_args(Name, Args, Result) :-
@@ -156,7 +156,7 @@ find_method([Head|Tail], Instance) :-
     define_method(Name = method(Args, Body), Instance),
     find_method(Tail, Instance).
 
-find_method([Head|Tail], Instance) :-
+find_method([_|Tail], Instance) :-
     find_method(Tail, Instance),
     !.
 

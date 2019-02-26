@@ -1,3 +1,6 @@
+:- dynamic instance/3.
+:- dynamic class/3.
+	   
 def_class(Class, Parents, Slots) :-
     rimuovi_duplicati(Parents, Parents_clean), 
     parents_control(Parents_clean, Class),
@@ -31,26 +34,39 @@ class_not_existance(_) :-
 
 new(Instance, Class_name) :-
     class(Class_name, _, _),
+
+    gate(Instance),
     instance_not_existance(Instance),
+    
     Term =.. [instance, Instance, Class_name, []],
     assert(Term),
     findall([Name, Body], get_all(Instance, Name, Body), Out),
     append(Out_clean, [_], Out),
     find_method(Out_clean, Instance),
     !.
-    
+
 new(Instance, Class_name, Values) :-
     class(Class_name, _, _),
     values_control(Values),
     class_values(Class_name, Values),
+    gate(Instance),
     instance_not_existance(Instance),
     Term =.. [instance, Instance, Class_name, Values],
     assert(Term),
+    findall([Name1, Body1], get_all(Instance, Name1, Body1), Out1),
+    append(Out_clean1, [_], Out1),
+    find_method(Out_clean1, Instance),
+    !.
+
+gate(Instance) :-
     findall([Name, Body], get_all(Instance, Name, Body), Out),
     append(Out_clean, [_], Out),
-    find_method(Out_clean, Instance),
+    find_delete_method(Out_clean, Instance),
     !.
-	
+
+gate(_) :-
+    !.
+
 instance_not_existance(Instance) :-
     retract(instance(Instance, _, _)),
     !.
@@ -156,11 +172,11 @@ prepare_args(Name, Args, Result) :-
     string_concat(Out3, ")", Result),
     !.
 
-prepare_args(Name, Args, Result) :-
+prepare_args(Inst, Args, Result) :-
     term_string(Args, String),
     sub_string(String, 1, _, 1, String_clean),
-    atom_string(Name, Name_string),
-    string_concat("( ", Name_string, Out),
+    atom_string(Inst, Inst_string),
+    string_concat("( ", Inst_string, Out),
     string_concat(Out, String_clean, Out2),
     string_concat(Out2, ")", Result),
     !.
@@ -188,3 +204,30 @@ define_method(Name = method(Args, Body), Instance) :-
     string_concat(Out3, ",!.", Result),
     term_string(Term, Result),
     assert(Term).
+
+find_delete_method([], _) :-
+    !.
+
+find_delete_method([Head|Tail], Instance) :-
+    nth0(0, Head, Name),
+    nth0(1, Head, method(Args, Body)),
+    delete_method(Name = method(Args, Body), Instance),
+    find_delete_method(Tail, Instance).
+
+find_delete_method([_|Tail], Instance) :-
+    find_delete_method(Tail, Instance),
+    !.
+
+delete_method(Name = method(Args, Body), Instance) :-
+    prepare_args(Instance, Args, New_args),
+    prepare_method(Instance, Body, Body_out),
+    atom_string(Name, Name_out),
+    string_concat(Name_out, New_args, Out),
+    string_concat(Out, ":-", Out2),
+    string_concat(Out2, Body_out, Out3),
+    string_concat(Out3, ",!.", Result),
+    term_string(Term, Result),
+    retract(Term).
+
+delete_method(_, _) :-
+    !.

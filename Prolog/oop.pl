@@ -1,14 +1,15 @@
+:- dynamic class/3.
+class(object, [], []).
+
 def_class(Class, Parents, Slots) :-
+    class_not_existance(Class),
     rimuovi_duplicati(Parents, Parents_clean), 
     parents_control(Parents_clean, Class),
+    append([object], Parents, Parents_final),
     values_control(Slots),
-    Term =.. [class, Class, Parents_clean, Slots],
+    Term =.. [class, Class, Parents_final, Slots],
     assert(Term),
     !.
-
-class_exist(Class) :-
-    class(Class, _, _),
-    retract(class(Class, _, _)).
 
 parents_control([], _).
 
@@ -24,13 +25,22 @@ values_control([Atom = _|Tail]) :-
     atom(Atom),
     values_control(Tail).
 
+class_not_existance(Class) :-
+    retract(class(Class, _, _)),
+    !.
+
+class_not_existance(_) :-
+    true,
+    !.
+    
 new(Instance, Class_name) :-
     class(Class_name, _, _),
     Term =.. [instance, Instance, Class_name, []],
     assert(Term),
     findall([Name, Body], get_all(Instance, Name, Body), Out),
     append(Out_clean, [_], Out),
-    find_method(Out_clean, Instance),!.
+    find_method(Out_clean, Instance),
+    !.
     
 new(Instance, Class_name, Values) :-
     class(Class_name, _, _),
@@ -40,7 +50,8 @@ new(Instance, Class_name, Values) :-
     assert(Term),
     findall([Name, Body], get_all(Instance, Name, Body), Out),
     append(Out_clean, [_], Out),
-    find_method(Out_clean, Instance),!.
+    find_method(Out_clean, Instance),
+    !.
 
 class_values(_, []).
 

@@ -32,9 +32,9 @@ class_not_existance(Class) :-
 class_not_existance(_) :-
     true,
     !.
-    
-new(Instance, Class_name) :-
+ new(Instance, Class_name) :-
     class(Class_name, _, _),
+    instance_not_existance(Instance),
     Term =.. [instance, Instance, Class_name, []],
     assert(Term),
     findall([Name, Body], get_all(Instance, Name, Body), Out),
@@ -44,6 +44,7 @@ new(Instance, Class_name) :-
     
 new(Instance, Class_name, Values) :-
     class(Class_name, _, _),
+    instance_not_existance(Instance),
     values_control(Values),
     class_values(Class_name, Values),
     Term =.. [instance, Instance, Class_name, Values],
@@ -52,7 +53,15 @@ new(Instance, Class_name, Values) :-
     append(Out_clean, [_], Out),
     find_method(Out_clean, Instance),
     !.
+	
+instance_not_existance(Instance) :-
+    retract(instance(Instance, _, _)),
+    !.
 
+instance_not_existance(_) :-
+    true,
+    !.
+    
 class_values(_, []).
 
 class_values(Class, [Name = _|Others]) :-

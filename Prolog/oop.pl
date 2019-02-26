@@ -93,10 +93,11 @@ not_member(X, [Y|T]) :-
     X \= Y,
     not_member(X, T).
 
-rimuovi_duplicati([], [], _).
 
 rimuovi_duplicati(A, B) :-
     rimuovi_duplicati(A, B, []).
+    
+rimuovi_duplicati([], [], _).
 
 rimuovi_duplicati([H|T], [H|Out], Old) :-
     not_member(H, Old),

@@ -2,11 +2,11 @@
 class(object, [], []).
 
 def_class(Class, Parents, Slots) :-
-    class_not_existance(Class),
     rimuovi_duplicati(Parents, Parents_clean), 
     parents_control(Parents_clean, Class),
     append([object], Parents, Parents_final),
     values_control(Slots),
+    class_not_existance(Class),
     Term =.. [class, Class, Parents_final, Slots],
     assert(Term),
     !.

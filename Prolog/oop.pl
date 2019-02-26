@@ -34,10 +34,8 @@ class_not_existance(_) :-
 
 new(Instance, Class_name) :-
     class(Class_name, _, _),
-
-    gate(Instance),
+    delete_gate(Instance),
     instance_not_existance(Instance),
-    
     Term =.. [instance, Instance, Class_name, []],
     assert(Term),
     findall([Name, Body], get_all(Instance, Name, Body), Out),
@@ -49,7 +47,7 @@ new(Instance, Class_name, Values) :-
     class(Class_name, _, _),
     values_control(Values),
     class_values(Class_name, Values),
-    gate(Instance),
+    delete_gate(Instance),
     instance_not_existance(Instance),
     Term =.. [instance, Instance, Class_name, Values],
     assert(Term),
@@ -58,13 +56,13 @@ new(Instance, Class_name, Values) :-
     find_method(Out_clean1, Instance),
     !.
 
-gate(Instance) :-
+delete_gate(Instance) :-
     findall([Name, Body], get_all(Instance, Name, Body), Out),
     append(Out_clean, [_], Out),
     find_delete_method(Out_clean, Instance),
     !.
 
-gate(_) :-
+delete_gate(_) :-
     !.
 
 instance_not_existance(Instance) :-

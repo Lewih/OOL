@@ -14,7 +14,7 @@ def_class(Class, Parents, Slots) :-
 %controllo esistenza dei parents
 parents_control([], _).
 
-parents_control([Head|Tail], Class_name) :-
+parents_control([Head | Tail], Class_name) :-
     atom(Head),
     class(Head, _, _),
     Head \= Class_name,
@@ -23,7 +23,7 @@ parents_control([Head|Tail], Class_name) :-
 %controllo consistenza dei valori 
 values_control([]).
 
-values_control([Atom = _|Tail]) :-
+values_control([Atom = _ | Tail]) :-
     atom(Atom),
     values_control(Tail).
 
@@ -84,14 +84,14 @@ instance_not_existance(_) :-
 %controllo che i valori istanziati in new siano consistenti
 class_values(_, []).
 
-class_values(Class, [Name = _|Others]) :-
+class_values(Class, [Name = _ | Others]) :-
     getv_hierarchy([Class], Name, _),
     class_values(Class, Others).
 
 %primitiva getv
 getv(Instance, Slot, Result) :-
     instance(Instance, _, Values),
-    value_in_list(Values, Slot,Result),
+    value_in_list(Values, Slot, Result),
     !.
 
 getv(Instance, Slot, Result) :-
@@ -102,7 +102,7 @@ getv(Instance, Slot, Result) :-
 %variante di getv per utilizzo con findall
 get_all(Instance, Slot, Result) :-
     instance(Instance, _, Values),
-    value_in_list(Values, Slot,Result).
+    value_in_list(Values, Slot, Result).
 
 get_all(Instance, Slot, Result) :-
     instance(Instance, Classname, _),
@@ -111,11 +111,11 @@ get_all(Instance, Slot, Result) :-
 %predicato che scorre la gerarchia di classi
 getv_hierarchy([], _, _).
 
-getv_hierarchy([Class|_], Slot, Result) :-
+getv_hierarchy([Class | _], Slot, Result) :-
     class(Class, _, Values),
     value_in_list(Values, Slot, Result).
 
-getv_hierarchy([Class|Parents], Slot, Result) :-
+getv_hierarchy([Class | Parents], Slot, Result) :-
     class(Class, New_parents, _),
     append(New_parents, Parents, New_list),
     getv_hierarchy(New_list, Slot, Result).
@@ -124,20 +124,20 @@ getv_hierarchy([Class|Parents], Slot, Result) :-
 getvx(Instance, [Slot], Result) :-
     getv(Instance, Slot, Result).
 
-getvx(Instance, [Slot|Others], Result) :-
+getvx(Instance, [Slot | Others], Result) :-
     getv(Instance, Slot, Match),
     getvx(Match, Others, Result).
 
 %controllo che un dato valore esista in una lista 'si fatta
-value_in_list([Name = Value|_], Name, Value).
+value_in_list([Name = Value | _], Name, Value).
 
-value_in_list([_ = _|Tail], Name, Result) :-
+value_in_list([_ = _ | Tail], Name, Result) :-
     value_in_list(Tail, Name, Result).
 
 %true se X non appartiene alla lista
 not_member(_, []).
 
-not_member(X, [Y|T]) :-
+not_member(X, [Y | T]) :-
     X \= Y,
     not_member(X, T).
 
@@ -147,11 +147,11 @@ rimuovi_duplicati(A, B) :-
     
 rimuovi_duplicati([], [], _).
 
-rimuovi_duplicati([H|T], [H|Out], Old) :-
+rimuovi_duplicati([H | T], [H | Out], Old) :-
     not_member(H, Old),
-    rimuovi_duplicati(T, Out, [H|Old]).
+    rimuovi_duplicati(T, Out, [H | Old]).
 
-rimuovi_duplicati([H|T], Out, Old) :-
+rimuovi_duplicati([H | T], Out, Old) :-
     member(H, Old),
     rimuovi_duplicati(T, Out, Old).
 
@@ -202,7 +202,7 @@ prepare_args(Inst, Args, Result) :-
 find_method([], _, _) :-
     !.
 
-find_method([Head|Tail], Instance, Ignore_list) :-
+find_method([Head | Tail], Instance, Ignore_list) :-
     nth0(0, Head, Name),
     nth0(1, Head, method(Args, Body)),
     not_member(Name, Ignore_list),
@@ -210,7 +210,7 @@ find_method([Head|Tail], Instance, Ignore_list) :-
     append([Name], Ignore_list, New_list),
     find_method(Tail, Instance, New_list).
 
-find_method([Head|Tail], Instance, Ignore_list) :-
+find_method([Head | Tail], Instance, Ignore_list) :-
     nth0(0, Head, Name),
     append([Name], Ignore_list, New_list),
     find_method(Tail, Instance, New_list),
@@ -231,13 +231,13 @@ define_method(Name = method(Args, Body), Instance) :-
 find_delete_method([], _) :-
     !.
 
-find_delete_method([Head|Tail], Instance) :-
+find_delete_method([Head | Tail], Instance) :-
     nth0(0, Head, Name),
     nth0(1, Head, method(Args, Body)),
     delete_method(Name = method(Args, Body), Instance),
     find_delete_method(Tail, Instance).
 
-find_delete_method([_|Tail], Instance) :-
+find_delete_method([_ | Tail], Instance) :-
     find_delete_method(Tail, Instance),
     !.
 

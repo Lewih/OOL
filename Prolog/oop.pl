@@ -40,7 +40,7 @@ new(Instance, Class_name) :-
     assert(Term),
     findall([Name, Body], get_all(Instance, Name, Body), Out),
     append(Out_clean, [_], Out),
-    find_method(Out_clean, Instance),
+    find_method(Out_clean, Instance, []),
     !.
 
 new(Instance, Class_name, Values) :-
@@ -53,7 +53,7 @@ new(Instance, Class_name, Values) :-
     assert(Term),
     findall([Name1, Body1], get_all(Instance, Name1, Body1), Out1),
     append(Out_clean1, [_], Out1),
-    find_method(Out_clean1, Instance),
+    find_method(Out_clean1, Instance, []),
     !.
 
 delete_gate(Instance) :-
@@ -81,11 +81,13 @@ class_values(Class, [Name = _|Others]) :-
 	
 getv(Instance, Slot, Result) :-
     instance(Instance, _, Values),
-    value_in_list(Values, Slot,Result),!.
+    value_in_list(Values, Slot,Result),
+    !.
 
 getv(Instance, Slot, Result) :-
     instance(Instance, Classname, _),
-    getv_hierarchy([Classname], Slot, Result),!.
+    getv_hierarchy([Classname], Slot, Result),
+    !.
 
 get_all(Instance, Slot, Result) :-
     instance(Instance, _, Values),
@@ -115,7 +117,7 @@ getvx(Instance, [Slot|Others], Result) :-
 
 value_in_list([Name = Value|_], Name, Value).
 
-value_in_list([_ = _|Tail],Name,Result) :-
+value_in_list([_ = _|Tail], Name, Result) :-
     value_in_list(Tail, Name, Result).
 
 not_member(_, []).
@@ -123,7 +125,6 @@ not_member(_, []).
 not_member(X, [Y|T]) :-
     X \= Y,
     not_member(X, T).
-
 
 rimuovi_duplicati(A, B) :-
     rimuovi_duplicati(A, B, []).
@@ -179,17 +180,21 @@ prepare_args(Inst, Args, Result) :-
     string_concat(Out2, ")", Result),
     !.
     
-find_method([], _) :-
+find_method([], _, _) :-
     !.
 
-find_method([Head|Tail], Instance) :-
+find_method([Head|Tail], Instance, Ignore_list) :-
     nth0(0, Head, Name),
     nth0(1, Head, method(Args, Body)),
+    not_member(Name, Ignore_list),
     define_method(Name = method(Args, Body), Instance),
-    find_method(Tail, Instance).
+    append([Name], Ignore_list, New_list),
+    find_method(Tail, Instance, New_list).
 
-find_method([_|Tail], Instance) :-
-    find_method(Tail, Instance),
+find_method([Head|Tail], Instance, Ignore_list) :-
+    nth0(0, Head, Name),
+    append([Name], Ignore_list, New_list),
+    find_method(Tail, Instance, New_list),
     !.
 
 define_method(Name = method(Args, Body), Instance) :-
@@ -198,8 +203,7 @@ define_method(Name = method(Args, Body), Instance) :-
     atom_string(Name, Name_out),
     string_concat(Name_out, New_args, Out),
     string_concat(Out, ":-", Out2),
-    string_concat(Out2, Body_out, Out3),
-    string_concat(Out3, ",!.", Result),
+    string_concat(Out2, Body_out, Result),
     term_string(Term, Result),
     assert(Term).
 
@@ -222,8 +226,7 @@ delete_method(Name = method(Args, Body), Instance) :-
     atom_string(Name, Name_out),
     string_concat(Name_out, New_args, Out),
     string_concat(Out, ":-", Out2),
-    string_concat(Out2, Body_out, Out3),
-    string_concat(Out3, ",!.", Result),
+    string_concat(Out2, Body_out, Result),
     term_string(Term, Result),
     retract(Term).
 

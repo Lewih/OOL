@@ -25,8 +25,9 @@ values_control([Atom = _|Tail]) :-
     values_control(Tail).
 
 class_not_existance(Class) :-
-    retract(class(Class, _, _)),
-    !.
+    class(Class, _, _),
+    !,
+    false.
 
 class_not_existance(_) :-
     true,

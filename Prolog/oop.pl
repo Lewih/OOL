@@ -1,15 +1,17 @@
 :- dynamic instance/3.
 :- dynamic class/3.
-	   
+
+%Primitiva def_class
 def_class(Class, Parents, Slots) :-
     rimuovi_duplicati(Parents, Parents_clean), 
     parents_control(Parents_clean, Class),
     values_control(Slots),
-    class_not_existance(Class),
+    class_existance(Class),
     Term =.. [class, Class, Parents_clean, Slots],
     assert(Term),
     !.
 
+%controllo esistenza dei parents
 parents_control([], _).
 
 parents_control([Head|Tail], Class_name) :-
@@ -18,21 +20,24 @@ parents_control([Head|Tail], Class_name) :-
     Head \= Class_name,
     parents_control(Tail, Class_name).
 
+%controllo consistenza dei valori 
 values_control([]).
 
 values_control([Atom = _|Tail]) :-
     atom(Atom),
     values_control(Tail).
 
-class_not_existance(Class) :-
+%controllo che la classe non esista gia'
+class_existance(Class) :-
     class(Class, _, _),
     !,
     false.
 
-class_not_existance(_) :-
+class_existance(_) :-
     true,
     !.
 
+%primitiva new\2 e new\3
 new(Instance, Class_name) :-
     class(Class_name, _, _),
     delete_gate(Instance),
@@ -57,6 +62,7 @@ new(Instance, Class_name, Values) :-
     find_method(Out_clean1, Instance, []),
     !.
 
+%elimino metodi associati ad una eventuale istanza omonima
 delete_gate(Instance) :-
     findall([Name, Body], get_all(Instance, Name, Body), Out),
     append(Out_clean, [_], Out),
@@ -66,6 +72,7 @@ delete_gate(Instance) :-
 delete_gate(_) :-
     !.
 
+%elimino eventuale istanza omonima
 instance_not_existance(Instance) :-
     retract(instance(Instance, _, _)),
     !.
@@ -73,13 +80,15 @@ instance_not_existance(Instance) :-
 instance_not_existance(_) :-
     true,
     !.
-    
+
+%controllo che i valori istanziati in new siano consistenti
 class_values(_, []).
 
 class_values(Class, [Name = _|Others]) :-
     getv_hierarchy([Class], Name, _),
     class_values(Class, Others).
-	
+
+%primitiva getv
 getv(Instance, Slot, Result) :-
     instance(Instance, _, Values),
     value_in_list(Values, Slot,Result),
@@ -90,6 +99,7 @@ getv(Instance, Slot, Result) :-
     getv_hierarchy([Classname], Slot, Result),
     !.
 
+%variante di getv per utilizzo con findall
 get_all(Instance, Slot, Result) :-
     instance(Instance, _, Values),
     value_in_list(Values, Slot,Result).
@@ -98,6 +108,7 @@ get_all(Instance, Slot, Result) :-
     instance(Instance, Classname, _),
     getv_hierarchy([Classname], Slot, Result).
 
+%predicato che scorre la gerarchia di classi
 getv_hierarchy([], _, _).
 
 getv_hierarchy([Class|_], Slot, Result) :-
@@ -109,6 +120,7 @@ getv_hierarchy([Class|Parents], Slot, Result) :-
     append(New_parents, Parents, New_list),
     getv_hierarchy(New_list, Slot, Result).
 
+%primitiva getvx
 getvx(Instance, [Slot], Result) :-
     getv(Instance, Slot, Result).
 
@@ -116,17 +128,20 @@ getvx(Instance, [Slot|Others], Result) :-
     getv(Instance, Slot, Match),
     getvx(Match, Others, Result).
 
+%controllo che un dato valore esista in una lista 'si fatta
 value_in_list([Name = Value|_], Name, Value).
 
 value_in_list([_ = _|Tail], Name, Result) :-
     value_in_list(Tail, Name, Result).
 
+%true se X non appartiene alla lista
 not_member(_, []).
 
 not_member(X, [Y|T]) :-
     X \= Y,
     not_member(X, T).
 
+%rimuovo duplicati in una lista preservandone ordine
 rimuovi_duplicati(A, B) :-
     rimuovi_duplicati(A, B, []).
     
@@ -140,6 +155,7 @@ rimuovi_duplicati([H|T], Out, Old) :-
     member(H, Old),
     rimuovi_duplicati(T, Out, Old).
 
+%preparo il corpo del metodo 
 prepare_method(Name, Method_term, Output) :-
     atom_string(Name, Name_string),
     term_string(Method_term, Method),
@@ -161,6 +177,7 @@ prepare_method(_, Meth, Out) :-
 prepare_method(_, Meth, Out) :-
     term_string(Meth, Out).
 
+%preparo gli argomenti del metodo 
 prepare_args(Name, Args, Result) :-
     term_string(Args, String),
     sub_string(String, 1, _, 1, String_clean),
@@ -180,7 +197,8 @@ prepare_args(Inst, Args, Result) :-
     string_concat(Out, String_clean, Out2),
     string_concat(Out2, ")", Result),
     !.
-    
+
+%identifico i metodi in una lista generata tramite findall
 find_method([], _, _) :-
     !.
 
@@ -198,6 +216,7 @@ find_method([Head|Tail], Instance, Ignore_list) :-
     find_method(Tail, Instance, New_list),
     !.
 
+%definisco il metodo
 define_method(Name = method(Args, Body), Instance) :-
     prepare_args(Instance, Args, New_args),
     prepare_method(Instance, Body, Body_out),
@@ -208,6 +227,7 @@ define_method(Name = method(Args, Body), Instance) :-
     term_string(Term, Result),
     assert(Term).
 
+%trovo i metodi per poi fare una retract
 find_delete_method([], _) :-
     !.
 
@@ -221,6 +241,7 @@ find_delete_method([_|Tail], Instance) :-
     find_delete_method(Tail, Instance),
     !.
 
+%retract del metodo
 delete_method(Name = method(Args, Body), Instance) :-
     prepare_args(Instance, Args, New_args),
     prepare_method(Instance, Body, Body_out),

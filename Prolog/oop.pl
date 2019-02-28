@@ -18,10 +18,10 @@ def_class(Class, Parents, Slots) :-
 %controllo esistenza e consistenza dei parents
 parents_control([], _).
 
-parents_control([Head | Tail], Class_name) :-
-    atom(Head),
-    class(Head, _, _),
-    Head \= Class_name,
+parents_control([Class | Tail], Class_name) :-
+    atom(Class),
+    class(Class, _, _),
+    Class \= Class_name,
     parents_control(Tail, Class_name).
 
 %controllo consistenza dei valori di Slots
@@ -63,8 +63,8 @@ find_classes([], Result, Output) :-
     !.
 
 %trovo tutte le istanze delle classi presenti nella lista
-find_instances([Head | Tail], Result, Output) :-
-    findall(Name, instance(Name, Head, _), Out),
+find_instances([Class | Tail], Result, Output) :-
+    findall(Name, instance(Name, Class, _), Out),
     append(Out, Result, Result1),
     find_instances(Tail, Result1, Output).
 

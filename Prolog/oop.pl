@@ -156,6 +156,19 @@ rimuovi_duplicati([H | T], Out, Old) :-
     rimuovi_duplicati(T, Out, Old).
 
 %preparo il corpo del metodo 
+prepare_method(Name, Method, Output) :-
+    atom_string(Name, Name_string),
+    string(Method),
+    sub_string(Method, Before, Length, End, "this"),
+    !,%cut rosso
+    EndThis is Before + Length,
+    End_string is End + 4,
+    sub_string(Method, 0, _, End_string, Start),
+    sub_string(Method, EndThis, _, 0, Out),
+    string_concat(Name_string, Out, Output1),
+    string_concat(Start, Output1, Output2),
+    prepare_method(Name, Output2, Output).
+
 prepare_method(Name, Method_term, Output) :-
     atom_string(Name, Name_string),
     term_string(Method_term, Method),

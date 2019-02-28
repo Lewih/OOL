@@ -51,7 +51,7 @@ class_existance(_, Term) :-
     !.
 
 %trovo tutte le classi discendenti di Class
-find_classes([Class|Tail], Result, Output) :-
+find_classes([Class | Tail], Result, Output) :-
     findall(Name, (class(Name, Parents, _),
 		   member(Class, Parents)), X),
     append(X, Result, Result1),
@@ -63,7 +63,7 @@ find_classes([], Result, Output) :-
     !.
 
 %trovo tutte le istanze delle classi presenti nella lista
-find_instances([Head|Tail], Result, Output) :-
+find_instances([Head | Tail], Result, Output) :-
     findall(Name, instance(Name, Head, _), Out),
     append(Out, Result, Result1),
     find_instances(Tail, Result1, Output).
@@ -110,6 +110,7 @@ new(Instance, Class_name, Values) :-
     !.
 
 %elimino metodi associati ad una eventuale istanza omonima
+%questo predicato funge da trampolino per find_delete_method
 delete_gate(Instance) :-
     findall([Name, Body], get_all(Instance, Name, Body), Out),
     append(Out_clean, [_], Out),

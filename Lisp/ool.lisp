@@ -154,15 +154,13 @@
 ;Effettiva getvx
 (defun getvx-recursive (instance slot-name)
   (cond
-    ((not (equal (first slot-name) 'OOLINST))
-     (error "Errore: si sta richiedendo un attributo non da un oggetto o da un metodo "))
     ((not (symbolp (first slot-name)))
      (error "Errore: slot-names devono essere simboli"))
     ((null (rest slot-name))
      (getv instance (first slot-name)))
     ((rest slot-name)
      (getvx-recursive (getv instance (first slot-name))
-		      (rest slot-name)))))	
+		      (rest slot-name)))))
 
 ;Riscrivo S-expression cosi da poter usare this
 (defun rewrite-method-code (method-name method-spec)

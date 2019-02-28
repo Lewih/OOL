@@ -48,6 +48,8 @@
   (cond
     ((equal parents NIL)
      NIL)
+    ((not (symbolp (first parents)))
+     (error "Errore: i parents devono essere lista di simboli"))
     ((not (get-class-spec (first parents)))
      (error "Errore: classe genitore non esistente"))
     ((or (equal (first parents) class-name)
@@ -75,8 +77,11 @@
 ;Primitiva New
 (defun new (class-name &rest parameters)
   (let* ((formatted (formatta parameters)))
-    (if (values-control formatted)
-	(error "Error: bad input format"))
+    (cond
+      ((not (symbolp class-name))
+       (error "Errore: class-name non e' un simbolo"))
+      ((values-control formatted)
+       (error "Error: bad input format")))
     (if (and (get-class-spec class-name)
 	     (instance-check class-name formatted))
 	(list 'oolinst
@@ -148,7 +153,7 @@
 ;Primitiva getvx, funge da trampolino
 (defun getvx (instance &rest slot-name)
   (if (null slot-name)
-      (error "Errore: slot-name vuoto"))
+      (error "Errore: slot-name+ vuoto"))
   (getvx-recursive instance slot-name))
 
 ;Effettiva getvx applicata ricorsivamente

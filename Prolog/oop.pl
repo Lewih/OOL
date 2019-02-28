@@ -206,6 +206,7 @@ rimuovi_duplicati([H | T], Out, Old) :-
     rimuovi_duplicati(T, Out, Old).
 
 %preparo il corpo del metodo lavorando su stringhe
+%uso cut rossi
 prepare_method(Name, Method, Output) :-
     atom_string(Name, Name_string),
     string(Method),

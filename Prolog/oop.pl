@@ -15,7 +15,7 @@ def_class(Class, Parents, Slots) :-
     class_existance(Class, Term),
     !.
 
-%controllo esistenza dei parents
+%controllo esistenza e consistenza dei parents
 parents_control([], _).
 
 parents_control([Head | Tail], Class_name) :-
@@ -24,7 +24,7 @@ parents_control([Head | Tail], Class_name) :-
     Head \= Class_name,
     parents_control(Tail, Class_name).
 
-%controllo consistenza dei valori 
+%controllo consistenza dei valori di Slots
 values_control([]).
 
 values_control([Atom = _ | Tail]) :-
@@ -209,7 +209,7 @@ prepare_method(Name, Method, Output) :-
     atom_string(Name, Name_string),
     string(Method),
     sub_string(Method, Before, Length, End, "this"),
-    !,%cut rosso
+    !,
     EndThis is Before + Length,
     End_string is End + 4,
     sub_string(Method, 0, _, End_string, Start),
@@ -222,7 +222,7 @@ prepare_method(Name, Method_term, Output) :-
     atom_string(Name, Name_string),
     term_string(Method_term, Method),
     sub_string(Method, Before, Length, End, "this"),
-    !,%cut rosso
+    !,
     EndThis is Before + Length,
     End_string is End + 4,
     sub_string(Method, 0, _, End_string, Start),

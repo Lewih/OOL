@@ -11,9 +11,8 @@ def_class(Class, Parents, Slots) :-
     rimuovi_duplicati(Parents, Parents_clean), 
     parents_control(Parents_clean, Class),
     values_control(Slots),
-    class_existance(Class),
     Term =.. [class, Class, Parents_clean, Slots],
-    assert(Term),
+    class_existance(Class, Term),
     !.
 
 %controllo esistenza dei parents
@@ -33,13 +32,49 @@ values_control([Atom = _ | Tail]) :-
     values_control(Tail).
 
 %controllo che la classe non esista gia'
-class_existance(Class) :-
+class_existance(Class, Term) :-
     class(Class, _, _),
-    !,
-    false.
+    find_classes([Class], [], Out),
+    append([Class], Out, Out1),
+    rimuovi_duplicati(Out1, Result),
+    find_instances(Result, [], Out2),
+    rimuovi_duplicati(Out2, Output),
+    delete_old_instances(Output),
+    retract(class(Class, _, _)),
+    assert(Term),
+    !.
 
-class_existance(_) :-
-    true,
+class_existance(_, Term) :-
+    assert(Term),
+    !.
+
+find_classes([Class|Tail], Result, Output) :-
+    findall(Name, (class(Name, Parents, _),
+		   member(Class, Parents)), X),
+    append(X, Result, Result1),
+    append(X, Tail, Out),
+    find_classes(Out, Result1, Output).
+
+find_classes([], Result, Output) :-
+    Output = Result,
+    !.
+
+find_instances([Head|Tail], Result, Output) :-
+    findall(Name, instance(Name, Head, _), Out),
+    append(Out, Result, Result1),
+    find_instances(Tail, Result1, Output).
+
+find_instances([], Result, Output) :-
+    Output = Result,
+    !.
+
+delete_old_instances([]) :-
+    !.
+
+delete_old_instances([Inst | Tail]) :-
+    delete_gate(Inst),
+    retract(instance(Inst, _, _)),
+    delete_old_instances(Tail),
     !.
 
 %primitiva new\2 e new\3

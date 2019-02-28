@@ -32,6 +32,8 @@ values_control([Atom = _ | Tail]) :-
     values_control(Tail).
 
 %controllo che la classe non esista gia'
+%se esiste elimino tutte le istanze influenzate
+%dal cambiamento e relativo metodo, poi ridefinisco la classe
 class_existance(Class, Term) :-
     class(Class, _, _),
     find_classes([Class], [], Out),
@@ -48,6 +50,7 @@ class_existance(_, Term) :-
     assert(Term),
     !.
 
+%trovo tutte le classi discendenti di Class
 find_classes([Class|Tail], Result, Output) :-
     findall(Name, (class(Name, Parents, _),
 		   member(Class, Parents)), X),
@@ -59,6 +62,7 @@ find_classes([], Result, Output) :-
     Output = Result,
     !.
 
+%trovo tutte le istanze delle classi presenti nella lista
 find_instances([Head|Tail], Result, Output) :-
     findall(Name, instance(Name, Head, _), Out),
     append(Out, Result, Result1),
@@ -68,6 +72,7 @@ find_instances([], Result, Output) :-
     Output = Result,
     !.
 
+%cancello tutte le istanze presenti nella lista
 delete_old_instances([]) :-
     !.
 

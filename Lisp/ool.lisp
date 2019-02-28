@@ -118,7 +118,7 @@
 	      (second is-in-tree)
 	      (error "Errore: valore non valido"))))))
 
-;Ritorna una coppia
+;Ritorna una coppia di valori di istanza
 (defun recursive-getv-instance (values slot-name)
   (cond
     ((equal values NIL)
@@ -128,7 +128,7 @@
     ((not (equal (first (first values)) slot-name))
      (recursive-getv-instance (rest values) slot-name))))
 
-;Ritorna una coppia
+;Ritorna una coppia di valori di una classe in gerarchia
 (defun recursive-getv-tree (classes slot-name)
   (let* ((is-in-level
 	  (recursive-getv-instance
@@ -145,13 +145,13 @@
 		(rest classes))
 	slot-name)))))
 
-;Primitiva getvx
+;Primitiva getvx, funge da trampolino
 (defun getvx (instance &rest slot-name)
   (if (null slot-name)
       (error "Errore: slot-name vuoto"))
   (getvx-recursive instance slot-name))
 
-;Effettiva getvx
+;Effettiva getvx applicata ricorsivamente
 (defun getvx-recursive (instance slot-name)
   (cond
     ((not (symbolp (first slot-name)))
@@ -170,7 +170,7 @@
        (list(append (list 'this) (second method-spec)))
        (list (append '(progn) (rest (rest method-spec)))))))
 
-;Funzione principale gestione metodi
+;Funzione principale gestione metodi, ritorna un eval di una lambda
 (defun process-method (method-name method-spec)
   (setf (fdefinition method-name)
 	(lambda (this &rest args)

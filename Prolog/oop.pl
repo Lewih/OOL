@@ -1,3 +1,7 @@
+%%%% Pugno Michele 830513
+%%%% Piovani Davide 830113
+
+%Definisco procedure dinamiche
 :- dynamic instance/3.
 :- dynamic class/3.
 
@@ -41,7 +45,7 @@ class_existance(_) :-
 new(Instance, Class_name) :-
     class(Class_name, _, _),
     delete_gate(Instance),
-    instance_not_existance(Instance),
+    instance_existance(Instance),
     Term =.. [instance, Instance, Class_name, []],
     assert(Term),
     findall([Name, Body], get_all(Instance, Name, Body), Out),
@@ -54,7 +58,7 @@ new(Instance, Class_name, Values) :-
     values_control(Values),
     class_values(Class_name, Values),
     delete_gate(Instance),
-    instance_not_existance(Instance),
+    instance_existance(Instance),
     Term =.. [instance, Instance, Class_name, Values],
     assert(Term),
     findall([Name1, Body1], get_all(Instance, Name1, Body1), Out1),
@@ -72,12 +76,12 @@ delete_gate(Instance) :-
 delete_gate(_) :-
     !.
 
-%elimino eventuale istanza omonima
-instance_not_existance(Instance) :-
+%elimino eventuale istanza omonima se esistente
+instance_existance(Instance) :-
     retract(instance(Instance, _, _)),
     !.
 
-instance_not_existance(_) :-
+instance_existance(_) :-
     true,
     !.
 
@@ -88,7 +92,7 @@ class_values(Class, [Name = _ | Others]) :-
     getv_hierarchy([Class], Name, _),
     class_values(Class, Others).
 
-%primitiva getv
+%primitiva getv, cerca nell'istanza poi per gerarchia
 getv(Instance, Slot, Result) :-
     instance(Instance, _, Values),
     value_in_list(Values, Slot, Result),
@@ -108,7 +112,7 @@ get_all(Instance, Slot, Result) :-
     instance(Instance, Classname, _),
     getv_hierarchy([Classname], Slot, Result).
 
-%predicato che scorre la gerarchia di classi
+%predicato che scorre la gerarchia di classi come da specifica Lisp
 getv_hierarchy([], _, _).
 
 getv_hierarchy([Class | _], Slot, Result) :-
@@ -120,7 +124,7 @@ getv_hierarchy([Class | Parents], Slot, Result) :-
     append(New_parents, Parents, New_list),
     getv_hierarchy(New_list, Slot, Result).
 
-%primitiva getvx
+%primitiva getvx come da specifica
 getvx(Instance, [Slot], Result) :-
     getv(Instance, Slot, Result).
 
@@ -128,7 +132,7 @@ getvx(Instance, [Slot | Others], Result) :-
     getv(Instance, Slot, Match),
     getvx(Match, Others, Result).
 
-%controllo che un dato valore esista in una lista 'si fatta
+%controllo che un dato valore esista in una lista cosi' fatta
 value_in_list([Name = Value | _], Name, Value).
 
 value_in_list([_ = _ | Tail], Name, Result) :-
@@ -155,7 +159,7 @@ rimuovi_duplicati([H | T], Out, Old) :-
     member(H, Old),
     rimuovi_duplicati(T, Out, Old).
 
-%preparo il corpo del metodo 
+%preparo il corpo del metodo lavorando su stringhe
 prepare_method(Name, Method, Output) :-
     atom_string(Name, Name_string),
     string(Method),
@@ -190,7 +194,7 @@ prepare_method(_, Meth, Out) :-
 prepare_method(_, Meth, Out) :-
     term_string(Meth, Out).
 
-%preparo gli argomenti del metodo 
+%preparo gli argomenti del metodo, lavoro su stringhe
 prepare_args(Name, Args, Result) :-
     term_string(Args, String),
     sub_string(String, 1, _, 1, String_clean),

@@ -7,6 +7,7 @@
 
 %Primitiva def_class
 def_class(Class, Parents, Slots) :-
+    atom(Class),
     rimuovi_duplicati(Parents, Parents_clean), 
     parents_control(Parents_clean, Class),
     values_control(Slots),
@@ -43,6 +44,7 @@ class_existance(_) :-
 
 %primitiva new\2 e new\3
 new(Instance, Class_name) :-
+    atom(Instance),
     class(Class_name, _, _),
     delete_gate(Instance),
     instance_existance(Instance),
@@ -54,6 +56,7 @@ new(Instance, Class_name) :-
     !.
 
 new(Instance, Class_name, Values) :-
+    atom(Instance),
     class(Class_name, _, _),
     values_control(Values),
     class_values(Class_name, Values),
@@ -94,11 +97,13 @@ class_values(Class, [Name = _ | Others]) :-
 
 %primitiva getv, cerca nell'istanza poi per gerarchia
 getv(Instance, Slot, Result) :-
+    atom(Slot),
     instance(Instance, _, Values),
     value_in_list(Values, Slot, Result),
     !.
 
 getv(Instance, Slot, Result) :-
+    atom(Slot),
     instance(Instance, Classname, _),
     getv_hierarchy([Classname], Slot, Result),
     !.

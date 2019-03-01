@@ -45,7 +45,6 @@ Implementazione delle primitive
     Richiama ricosivamente getv per ottenere il comportamento
     richiesto in specifica.
 
-identify-method: funzione tail-recursive che scorre una lista dei
-parametri/metodi di una classe/oggetto ed esegue la process-method sui metodi,
-predisponendoli per essere chiamati.
+In tutte le funzioni vengono effettuati controlli
+circa la consistenza degli argomenti come da specifica.
 

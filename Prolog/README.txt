@@ -53,10 +53,9 @@ Implementazione delle primitive
 4) getvx(<instance>, <slot-names>, <result>) :
 
     richiama ricosivamente getv per prendere un valore da classi contenute
-    in altre classi come da specifica, da errore nel caso uno dei parametri su cui
-    deve effettuare la get risulti un metodoo o non risulti una classe.
+    in altre classi come da specifica, da errore nel caso uno dei parametri
+    su cui deve effettuare la get risulti un metodoo o non risulti una classe.
 
 
 In tutti i predicati vengono effettuati controlli
-circa la consistenza degli argomenti inseriti come
-da specifica.
+circa la consistenza degli argomenti come da specifica.

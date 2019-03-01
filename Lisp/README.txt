@@ -5,7 +5,7 @@ OOL
 
 Implementazione delle primitive
 
-1) '(' def-class <class-name>, <parents>, <slot-values>* ')' :
+1) '(' def-class <class-name>, <parents>, <slot-values>* ')'
 
     Prende in input il nome della classe, i parents della classe e
     una lista di slot value come da specifica.
@@ -20,7 +20,7 @@ Implementazione delle primitive
     della classe deprecata viene lasciata all'utente.
 
 
-2) '(' new <class-name>, [<slot-name>, <value>]* ')' :
+2) '(' new <class-name>, [<slot-name>, <value>]* ')'
 
     Ritorna una nuova istanza della classe nella forma:
     
@@ -34,13 +34,13 @@ Implementazione delle primitive
     	((<Nome> <Valore) (<Nome1> <Valore1>) ... )
 
 
-3) '(' getv <instance> <slot-name> ')' :
+3) '(' getv <instance> <slot-name> ')'
 
     Ritorna il valore associato allo slot-name passato relativo
     all'istanza passata, se nell'istanza non è presente il valore
     allora la ricerca si estende alle superclassi come da specifica.
 
-4) '(' getvx <instance> <slot-name>+ ')' :
+4) '(' getvx <instance> <slot-name>+ ')'
 
     Richiama ricosivamente getv per ottenere il comportamento
     richiesto in specifica.

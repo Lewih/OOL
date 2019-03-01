@@ -34,6 +34,7 @@ values_control([Atom = _ | Tail]) :-
 %%% Controllo che la classe non esista gia'
 %%% se esiste elimino tutte le istanze influenzate
 %%% dal cambiamento e relativo metodo, poi ridefinisco la classe
+%%% altrimenti asserisco semplicemente la classe
 class_existance(Class, Term) :-
     class(Class, _, _),
     find_classes([Class], [], Out),

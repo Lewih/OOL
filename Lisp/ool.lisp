@@ -1,21 +1,21 @@
 ;;;; Pugno Michele 830513
 ;;;; Piovani Davide 830113
 
-;Definizione e manipolazione Hash-Table
+;;; Definizione e manipolazione Hash-Table
 (defparameter *classes-specs* (make-hash-table))
 (defun add-class-spec (name class-spec)
   (setf (gethash name *classes-specs*) class-spec))
 (defun get-class-spec (name)
   (gethash name *classes-specs*))
 
-;Funzione formattazione per lista associativa
+;;; Funzione formattazione per lista associativa
 (defun formatta (slot-value)
   (if (null slot-value)
       nil
       (append (list (list (first slot-value) (second slot-value)))
 	      (formatta (cdr( cdr slot-value))))))
 
-;Primitiva definizione classe
+;;; Primitiva definizione classe
 (defun def-class (class-name parents &rest slot-value)
   (cond
     ((not (symbolp class-name))
@@ -36,14 +36,14 @@
     (add-class-spec class-name (list genitori formatted-slot)))
   class-name)
 
-;controllo che first sia simbolo in slot-value formattata
+;;; Controllo che first sia simbolo in slot-value formattata
 (defun values-control (values)
   (if (equal values NIL)
       NIL
       (or (not(symbolp (first (first values))))
 	  (values-control (rest values)))))
 
-;Controllo esistenza parents e omonimia con class-name
+;;; Controllo esistenza parents e omonimia con class-name
 (defun parents-control (class-name parents)
   (cond
     ((equal parents NIL)
@@ -55,7 +55,7 @@
     ((or (equal (first parents) class-name)
 	 (parents-control class-name (rest parents))))))
 
-;Identifico i metodi e li tratto
+;;; Identifico i metodi e li tratto
 (defun identify-method (values result)
   (cond
     ((null values)
@@ -74,7 +74,7 @@
 		      (append result
 			      (list (first values)))))))
 
-;Primitiva New
+;;; Primitiva New
 (defun new (class-name &rest parameters)
   (let* ((formatted (formatta parameters)))
     (cond
@@ -89,7 +89,7 @@
 	      (identify-method formatted nil))
 	(error "Errore: classe o parametro incompatibile"))))
 
-;Controllo valori e metodi di New 
+;;; Controllo valori e metodi di New 
 (defun instance-check (class parameters)
   (if (equal parameters NIL)
       T
@@ -104,7 +104,7 @@
 		  (not (equal '=> instance-value))))
 	 (instance-check class (rest parameters))))))
 
-;Primitiva getv
+;;; Primitiva getv
 (defun getv (instance slot-name)
   (cond
     ((or (not (symbolp slot-name))
@@ -123,7 +123,7 @@
 	      (second is-in-tree)
 	      (error "Errore: valore non valido"))))))
 
-;Ritorna una coppia di valori di istanza
+;;; Ritorna una coppia di valori di istanza
 (defun recursive-getv-instance (values slot-name)
   (cond
     ((equal values NIL)
@@ -133,7 +133,7 @@
     ((not (equal (first (first values)) slot-name))
      (recursive-getv-instance (rest values) slot-name))))
 
-;Ritorna una coppia di valori di una classe in gerarchia
+;;; Ritorna una coppia di valori di una classe in gerarchia
 (defun recursive-getv-tree (classes slot-name)
   (let* ((is-in-level
 	  (recursive-getv-instance
@@ -150,13 +150,13 @@
 		(rest classes))
 	slot-name)))))
 
-;Primitiva getvx, funge da trampolino
+;;; Primitiva getvx, funge da trampolino
 (defun getvx (instance &rest slot-name)
   (if (null slot-name)
       (error "Errore: slot-name+ vuoto"))
   (getvx-recursive instance slot-name))
 
-;Effettiva getvx applicata ricorsivamente
+;;; Effettiva getvx applicata ricorsivamente
 (defun getvx-recursive (instance slot-name)
   (cond
     ((not (symbolp (first slot-name)))
@@ -167,7 +167,7 @@
      (getvx-recursive (getv instance (first slot-name))
 		      (rest slot-name)))))
 
-;Riscrivo S-expression cosi da poter usare this
+;;; Riscrivo S-expression cosi da poter usare this
 (defun rewrite-method-code (method-name method-spec)
   (if (symbolp method-name)
       (append
@@ -175,7 +175,7 @@
        (list(append (list 'this) (second method-spec)))
        (list (append '(progn) (rest (rest method-spec)))))))
 
-;Funzione principale gestione metodi, ritorna un eval di una lambda
+;;; Funzione principale gestione metodi, ritorna un eval di una lambda
 (defun process-method (method-name method-spec)
   (setf (fdefinition method-name)
 	(lambda (this &rest args)
